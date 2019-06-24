@@ -618,49 +618,33 @@ function installOpenVPN () {
 		rm -rf /etc/openvpn/easy-rsa/
 	fi
 
-	# Install the latest version of easy-rsa from source
+	# Get easy-rsa
 	wget -O ~/EasyRSA-3.0.4.tgz https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.4/EasyRSA-3.0.4.tgz
 	tar xzf ~/EasyRSA-3.0.4.tgz -C ~/
 	mv ~/EasyRSA-3.0.4/ /etc/openvpn/
 	mv /etc/openvpn/EasyRSA-3.0.4/ /etc/openvpn/easy-rsa/
 	chown -R root:root /etc/openvpn/easy-rsa/
 	rm -f ~/EasyRSA-3.0.4.tgz
-	case $CERT_TYPE in
-		1)
-			echo "set_var EASYRSA_ALGO ec" > vars
-			echo "set_var EASYRSA_CURVE $CERT_CURVE" >> vars
-		;;
-		2)
-			echo "set_var EASYRSA_KEY_SIZE $RSA_KEY_SIZE" > vars
-		;;
-	esac
-
+	cd /etc/openvpn/easy-rsa/ || return
 	# Generate a random, alphanumeric identifier of 16 characters for CN and one for server name
-	SERVER_CN="cn_$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)"
-	SERVER_NAME="server_$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)"
+	SERVER_CN="cn_$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 16 | head -n 1)"
+	SERVER_NAME="server_$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 16 | head -n 1)"
+	echo "set_var EASYRSA_KEY_SIZE $RSA_KEY_SIZE" > vars
 	echo "set_var EASYRSA_REQ_CN $SERVER_CN" >> vars
-	# Create the PKI, set up the CA, the DH params and the server certificate
+	# Create the PKI, set up the CA, the DH params and the server + client certificates
 	./easyrsa init-pki
 	./easyrsa --batch build-ca nopass
-
-	if [[ $DH_TYPE == "2" ]]; then
-		# ECDH keys are generated on-the-fly so we don't need to generate them beforehand
-		openssl dhparam -out dh.pem $DH_KEY_SIZE
-	fi
-	
-	./easyrsa build-server-full "$SERVER_NAME" nopass
+	openssl dhparam -out dh.pem $DH_KEY_SIZE
+	./easyrsa build-server-full $SERVER_NAME nopass
+	./easyrsa build-client-full $CLIENT nopass
 	EASYRSA_CRL_DAYS=3650 ./easyrsa gen-crl
-	
-	
+	# generate tls-auth key
+	openvpn --genkey --secret /etc/openvpn/tls-auth.key
 	# Move all the generated files
-	cp pki/ca.crt pki/private/ca.key "pki/issued/$SERVER_NAME.crt" "pki/private/$SERVER_NAME.key" /etc/openvpn/easy-rsa/pki/crl.pem /etc/openvpn
-	if [[ $DH_TYPE == "2" ]]; then
-		cp dh.pem /etc/openvpn
-	fi
-	
+	cp pki/ca.crt pki/private/ca.key dh.pem pki/issued/$SERVER_NAME.crt pki/private/$SERVER_NAME.key /etc/openvpn/easy-rsa/pki/crl.pem /etc/openvpn
 	# Make cert revocation list readable for non-root
 	chmod 644 /etc/openvpn/crl.pem
-
+	
 	# Generate server.conf
 	echo "port $PORT" > /etc/openvpn/server.conf
 	if [[ "$IPV6_SUPPORT" = 'n' ]]; then
