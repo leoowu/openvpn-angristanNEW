@@ -340,7 +340,7 @@ function installQuestions () {
 		CERT_TYPE="1" # ECDSA
 		CERT_CURVE="prime256v1"
 		CC_CIPHER="TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256"
-		DH_TYPE="1" # dh
+		DH_TYPE="2" # DH
 		DH_CURVE="prime256v1"
 		HMAC_ALG="SHA256"
 	else
