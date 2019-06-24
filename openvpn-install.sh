@@ -336,14 +336,10 @@ function installQuestions () {
 	done
 	if [[ $CUSTOMIZE_ENC == "n" ]];then
 		# Use default, sane and fast parameters
-		CIPHER="AES-128-GCM"
 		CERT_TYPE="1" # ECDSA
 		CERT_CURVE="prime256v1"
-		CC_CIPHER="TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256"
 		DH_TYPE="1" # ECDH
 		DH_CURVE="prime256v1"
-		HMAC_ALG="SHA256"
-		TLS_SIG="1" # tls-crypt
 	else
 		echo ""
 		echo "Choose which cipher you want to use for the data channel:"
@@ -654,16 +650,6 @@ function installOpenVPN () {
 	./easyrsa build-server-full "$SERVER_NAME" nopass
 	EASYRSA_CRL_DAYS=3650 ./easyrsa gen-crl
 	
-	case $TLS_SIG in
-		1)
-			# Generate tls-crypt key
-			openvpn --genkey --secret /etc/openvpn/tls-crypt.key
-		;;
-		2)
-			# Generate tls-auth key
-			openvpn --genkey --secret /etc/openvpn/tls-auth.key
-		;;
-	esac
 	
 	# Move all the generated files
 	cp pki/ca.crt pki/private/ca.key "pki/issued/$SERVER_NAME.crt" "pki/private/$SERVER_NAME.key" /etc/openvpn/easy-rsa/pki/crl.pem /etc/openvpn
