@@ -332,7 +332,7 @@ function installQuestions () {
 	echo "See https://github.com/angristan/openvpn-install#security-and-encryption to learn more."
 	echo ""
 	until [[ $CUSTOMIZE_ENC =~ (y|n) ]]; do
-		read -rp "Customize encryption settings? [y/n]: " -e -i n CUSTOMIZE_ENC
+		read -rp "Customize encryption settings? [y/n]: " -e -i y CUSTOMIZE_ENC
 	done
 	if [[ $CUSTOMIZE_ENC == "n" ]];then
 		# Use default, sane and fast parameters
@@ -377,10 +377,10 @@ function installQuestions () {
 		esac
 		echo ""
 		echo "Choose what kind of certificate you want to use:"
-		echo "   1) ECDSA (recommended)"
-		echo "   2) RSA"
+		echo "   1) ECDSA"
+		echo "   2) RSA (recommended)"
 		until [[ $CERT_TYPE =~ ^[1-2]$ ]]; do
-			read -rp"Certificate key type [1-2]: " -e -i 1 CERT_TYPE
+			read -rp"Certificate key type [1-2]: " -e -i 2 CERT_TYPE
 		done
 		case $CERT_TYPE in
 			1)
@@ -462,10 +462,10 @@ function installQuestions () {
 		esac
 		echo ""
 		echo "Choose what kind of Diffie-Hellman key you want to use:"
-		echo "   1) ECDH (recommended)"
-		echo "   2) DH"
+		echo "   1) ECDH"
+		echo "   2) DH  (recommended)"
 		until [[ $DH_TYPE =~ [1-2] ]]; do
-			read -rp"DH key type [1-2]: " -e -i 1 DH_TYPE
+			read -rp"DH key type [1-2]: " -e -i 2 DH_TYPE
 		done
 		case $DH_TYPE in
 			1)
@@ -536,14 +536,7 @@ function installQuestions () {
 				HMAC_ALG="SHA512"
 			;;
 		esac
-		echo ""
-		echo "You can add an additional layer of security to the control channel with tls-auth and tls-crypt"
-		echo "tls-auth authenticates the packets, while tls-crypt authenticate and encrypt them."
-		echo "   1) tls-crypt (recommended)"
-		echo "   2) tls-auth"
-		until [[ $TLS_SIG =~ [1-2] ]]; do
-				read -rp "Control channel additional security mechanism [1-2]: " -e -i 1 TLS_SIG
-		done
+	
 	fi
 	echo ""
 	echo "Okay, that was all I needed. We are ready to setup your OpenVPN server now."
