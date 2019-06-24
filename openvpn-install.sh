@@ -619,14 +619,12 @@ function installOpenVPN () {
 	fi
 
 	# Install the latest version of easy-rsa from source
-	local version="3.0.4"
-	wget -O ~/EasyRSA-unix-v${version}.tgz https://github.com/OpenVPN/easy-rsa/releases/download/v${version}/EasyRSA-unix-v${version}.tgz
-	tar xzf ~/EasyRSA-unix-v${version}.tgz -C ~/
-	mv ~/EasyRSA-v${version} /etc/openvpn/easy-rsa
+	wget -O ~/EasyRSA-3.0.4.tgz https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.4/EasyRSA-3.0.4.tgz
+	tar xzf ~/EasyRSA-3.0.4.tgz -C ~/
+	mv ~/EasyRSA-3.0.4/ /etc/openvpn/
+	mv /etc/openvpn/EasyRSA-3.0.4/ /etc/openvpn/easy-rsa/
 	chown -R root:root /etc/openvpn/easy-rsa/
-	rm -f ~/EasyRSA-unix-v${version}.tgz
-
-	cd /etc/openvpn/easy-rsa/
+	rm -f ~/EasyRSA-3.0.4.tgz
 	case $CERT_TYPE in
 		1)
 			echo "set_var EASYRSA_ALGO ec" > vars
