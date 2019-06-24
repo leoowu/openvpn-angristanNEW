@@ -340,7 +340,7 @@ function installQuestions () {
 		CERT_TYPE="1" # ECDSA
 		CERT_CURVE="prime256v1"
 		CC_CIPHER="TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256"
-		DH_TYPE="1" # ECDH
+		DH_TYPE="1" # dh
 		DH_CURVE="prime256v1"
 		HMAC_ALG="SHA256"
 	else
@@ -752,6 +752,7 @@ push "redirect-gateway ipv6"' >> /etc/openvpn/server.conf
 	fi
 
 	if [[ $DH_TYPE == "1" ]]; then
+		echo "dh none" >> /etc/openvpn/server.conf
 		echo "ecdh-curve $DH_CURVE" >> /etc/openvpn/server.conf
 	elif [[ $DH_TYPE == "2" ]]; then
 		echo "dh dh.pem" >> /etc/openvpn/server.conf
