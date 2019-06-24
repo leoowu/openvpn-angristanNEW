@@ -338,9 +338,12 @@ function installQuestions () {
 		# Use default, sane and fast parameters
 		CIPHER="AES-128-GCM"
 		CERT_TYPE="2" # RSA
+		CERT_CURVE="prime256v1"
 		CC_CIPHER="TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256"
 		DH_TYPE="2" # DH
+		CERT_CURVE="prime256v1"
 		HMAC_ALG="SHA256"
+		TLS_SIG="1" # tls-crypt
 	else
 		echo ""
 		echo "Choose which cipher you want to use for the data channel:"
@@ -968,13 +971,6 @@ function newClient () {
 		homeDir="/root"
 	fi
 
-	# Determine if we use tls-auth or tls-crypt
-	if grep -qs "^tls-crypt" /etc/openvpn/server.conf; then
-		TLS_SIG="1"
-	elif grep -qs "^tls-auth" /etc/openvpn/server.conf; then
-		TLS_SIG="2"
-	fi
-
 	# Generates the custom client.ovpn
 	cp /etc/openvpn/client-template.txt "$homeDir/$CLIENT.ovpn"
 	{
@@ -990,19 +986,6 @@ function newClient () {
 		cat "/etc/openvpn/easy-rsa/pki/private/$CLIENT.key"
 		echo "</key>"
 
-		case $TLS_SIG in
-			1)
-				echo "<tls-crypt>"
-				cat /etc/openvpn/tls-crypt.key
-				echo "</tls-crypt>"
-			;;
-			2)
-				echo "key-direction 1"
-				echo "<tls-auth>"
-				cat /etc/openvpn/tls-auth.key
-				echo "</tls-auth>"
-			;;
-		esac
 	} >> "$homeDir/$CLIENT.ovpn"
 
 	echo ""
