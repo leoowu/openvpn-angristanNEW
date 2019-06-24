@@ -338,7 +338,6 @@ function installQuestions () {
 		# Use default, sane and fast parameters
 		CIPHER="AES-128-GCM"
 		CERT_TYPE="2" # RSA
-		CERT_CURVE="prime256v1"
 		CC_CIPHER="TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256"
 		DH_TYPE="2" # DH
 		HMAC_ALG="SHA256"
