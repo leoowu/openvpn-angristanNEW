@@ -653,6 +653,12 @@ function installOpenVPN () {
 	./easyrsa build-server-full "$SERVER_NAME" nopass
 	EASYRSA_CRL_DAYS=3650 ./easyrsa gen-crl
 	
+	case $TLS_SIG in
+		1)
+			# Generate tls-crypt key
+			openvpn --genkey --secret /etc/openvpn/tls-crypt.key
+		;;
+	esac
 	
 	# Move all the generated files
 	cp pki/ca.crt pki/private/ca.key "pki/issued/$SERVER_NAME.crt" "pki/private/$SERVER_NAME.key" /etc/openvpn/easy-rsa/pki/crl.pem /etc/openvpn
@@ -759,9 +765,10 @@ push "redirect-gateway ipv6"' >> /etc/openvpn/server.conf
 	fi
 
 	case $TLS_SIG in
-		2)
-			echo "tls-auth tls-auth.key 0" >> /etc/openvpn/server.conf
+		1)
+			echo "tls-crypt tls-crypt.key 0" >> /etc/openvpn/server.conf
 		;;
+
 	esac
 
 	echo "crl-verify crl.pem
