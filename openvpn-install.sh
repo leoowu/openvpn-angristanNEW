@@ -341,7 +341,6 @@ function installQuestions () {
 		CERT_CURVE="prime256v1"
 		CC_CIPHER="TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256"
 		DH_TYPE="2" # DH
-		DH_CURVE="prime256v1"
 		HMAC_ALG="SHA256"
 	else
 		echo ""
@@ -462,10 +461,10 @@ function installQuestions () {
 		esac
 		echo ""
 		echo "Choose what kind of Diffie-Hellman key you want to use:"
-		echo "   1) ECDH (recommended)"
-		echo "   2) DH"
+		echo "   1) ECDH"
+		echo "   2) DH (recommended)"
 		until [[ $DH_TYPE =~ [1-2] ]]; do
-			read -rp"DH key type [1-2]: " -e -i 1 DH_TYPE
+			read -rp"DH key type [1-2]: " -e -i 2 DH_TYPE
 		done
 		case $DH_TYPE in
 			1)
