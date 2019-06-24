@@ -782,12 +782,9 @@ push "redirect-gateway ipv6"' >> /etc/openvpn/server.conf
 ca ca.crt
 cert $SERVER_NAME.crt
 key $SERVER_NAME.key 
-auth $HMAC_ALG
-cipher $CIPHER
-ncp-ciphers $CIPHER
-tls-server
-tls-version-min 1.2
-tls-cipher $CC_CIPHER
+auth none
+cipher none
+ncp-disable
 status /var/log/openvpn/status.log
 verb 3" >> /etc/openvpn/server.conf
 
@@ -927,12 +924,9 @@ persist-key
 persist-tun
 remote-cert-tls server
 verify-x509-name $SERVER_NAME name
-auth $HMAC_ALG
+auth none
 auth-nocache
-cipher $CIPHER
-tls-client
-tls-version-min 1.2
-tls-cipher $CC_CIPHER
+cipher none
 setenv opt block-outside-dns # Prevent Windows 10 DNS leak
 verb 3" >> /etc/openvpn/client-template.txt
 
