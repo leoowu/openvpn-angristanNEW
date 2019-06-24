@@ -261,7 +261,7 @@ function installQuestions () {
 	echo "   1) UDP"
 	echo "   2) TCP"
 	until [[ "$PROTOCOL_CHOICE" =~ ^[1-2]$ ]]; do
-		read -rp "Protocol [1-2]: " -e -i 1 PROTOCOL_CHOICE
+		read -rp "Protocol [1-2]: " -e -i 2 PROTOCOL_CHOICE
 	done
 	case $PROTOCOL_CHOICE in
 		1)
@@ -285,7 +285,7 @@ function installQuestions () {
 	echo "   10) Yandex Basic (Russia)"
 	echo "   11) AdGuard DNS (Russia)"
 	until [[ "$DNS" =~ ^[0-9]+$ ]] && [ "$DNS" -ge 1 ] && [ "$DNS" -le 11 ]; do
-		read -rp "DNS [1-10]: " -e -i 3 DNS
+		read -rp "DNS [1-10]: " -e -i 1 DNS
 			if [[ $DNS == 2 ]] && [[ -e /etc/unbound/unbound.conf ]]; then
 				echo ""
 				echo "Unbound is already installed."
@@ -782,12 +782,9 @@ push "redirect-gateway ipv6"' >> /etc/openvpn/server.conf
 ca ca.crt
 cert $SERVER_NAME.crt
 key $SERVER_NAME.key 
-auth $HMAC_ALG
-cipher $CIPHER
-ncp-ciphers $CIPHER
-tls-server
-tls-version-min 1.2
-tls-cipher $CC_CIPHER
+auth none
+cipher none
+ncp-disable
 status /var/log/openvpn/status.log
 verb 3" >> /etc/openvpn/server.conf
 
@@ -927,12 +924,9 @@ persist-key
 persist-tun
 remote-cert-tls server
 verify-x509-name $SERVER_NAME name
-auth $HMAC_ALG
+auth none
 auth-nocache
-cipher $CIPHER
-tls-client
-tls-version-min 1.2
-tls-cipher $CC_CIPHER
+cipher none
 setenv opt block-outside-dns # Prevent Windows 10 DNS leak
 verb 3" >> /etc/openvpn/client-template.txt
 
@@ -1006,19 +1000,6 @@ function newClient () {
 		cat "/etc/openvpn/easy-rsa/pki/private/$CLIENT.key"
 		echo "</key>"
 
-		case $TLS_SIG in
-			1)
-				echo "<tls-crypt>"
-				cat /etc/openvpn/tls-crypt.key
-				echo "</tls-crypt>"
-			;;
-			2)
-				echo "key-direction 1"
-				echo "<tls-auth>"
-				cat /etc/openvpn/tls-auth.key
-				echo "</tls-auth>"
-			;;
-		esac
 	} >> "$homeDir/$CLIENT.ovpn"
 
 	echo ""
