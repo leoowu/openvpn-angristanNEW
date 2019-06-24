@@ -759,9 +759,6 @@ push "redirect-gateway ipv6"' >> /etc/openvpn/server.conf
 	fi
 
 	case $TLS_SIG in
-		1)
-			echo "tls-crypt tls-crypt.key 0" >> /etc/openvpn/server.conf
-		;;
 		2)
 			echo "tls-auth tls-auth.key 0" >> /etc/openvpn/server.conf
 		;;
