@@ -343,7 +343,6 @@ function installQuestions () {
 		DH_TYPE="2" # DH
 		CERT_CURVE="prime256v1"
 		HMAC_ALG="SHA256"
-		TLS_SIG="1" # tls-crypt
 	else
 		echo ""
 		echo "Choose which cipher you want to use for the data channel:"
@@ -381,7 +380,7 @@ function installQuestions () {
 		echo "   1) ECDSA (recommended)"
 		echo "   2) RSA"
 		until [[ $CERT_TYPE =~ ^[1-2]$ ]]; do
-			read -rp"Certificate key type [1-2]: " -e -i 1 CERT_TYPE
+			read -rp"Certificate key type [1-2]: " -e -i 2 CERT_TYPE
 		done
 		case $CERT_TYPE in
 			1)
@@ -970,7 +969,14 @@ function newClient () {
 	else  # if not SUDO_USER, use /root
 		homeDir="/root"
 	fi
-
+	
+	# Determine if we use tls-auth or tls-crypt
+	if grep -qs "^tls-crypt" /etc/openvpn/server.conf; then
+		TLS_SIG="1"
+	elif grep -qs "^tls-auth" /etc/openvpn/server.conf; then
+		TLS_SIG="2"
+	fi
+	
 	# Generates the custom client.ovpn
 	cp /etc/openvpn/client-template.txt "$homeDir/$CLIENT.ovpn"
 	{
@@ -985,7 +991,20 @@ function newClient () {
 		echo "<key>"
 		cat "/etc/openvpn/easy-rsa/pki/private/$CLIENT.key"
 		echo "</key>"
-
+		
+		case $TLS_SIG in
+			1)
+				echo "<tls-crypt>"
+				cat /etc/openvpn/tls-crypt.key
+				echo "</tls-crypt>"
+			;;
+			2)
+				echo "key-direction 1"
+				echo "<tls-auth>"
+				cat /etc/openvpn/tls-auth.key
+				echo "</tls-auth>"
+			;;
+		esac
 	} >> "$homeDir/$CLIENT.ovpn"
 
 	echo ""
