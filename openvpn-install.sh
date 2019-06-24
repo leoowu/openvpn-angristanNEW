@@ -494,7 +494,7 @@ function installQuestions () {
 				echo "   2) 3072 bits"
 				echo "   3) 4096 bits"
 				until [[ "$DH_KEY_SIZE_CHOICE" =~ ^[1-3]$ ]]; do
-					read -rp "DH key size [1-3]: " -e -i 1 DH_KEY_SIZE_CHOICE
+					read -rp "DH key size [1-3]: " -e -i 2 DH_KEY_SIZE_CHOICE
 				done
 				case $DH_KEY_SIZE_CHOICE in
 					1)
